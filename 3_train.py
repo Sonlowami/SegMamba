@@ -164,7 +164,7 @@ class BraTSTrainer(Trainer):
         checkpoint_file = sorted(glob(os.path.join(root_path, f"{symbol}_model_*.pt")))[-1]
         if checkpoint_file:
             print(f"Loading checkpoint from {checkpoint_file}")
-            self.model.load_state_dict(torch.load(checkpoint_file, weight_only=False))
+            self.model.load_state_dict(torch.load(checkpoint_file, weights_only=False))
         else:
             print(f"No checkpoint found with symbol {symbol} in {root_path}. Starting training from scratch.")
 
