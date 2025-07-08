@@ -163,10 +163,10 @@ class BraTSTrainer(Trainer):
         assert os.path.isdir(root_path), f"Root path {root_path} is not a directory"
         checkpoint_file = sorted(glob(os.path.join(root_path, f"{symbol}_model_*.pt")))[-1]
         if checkpoint_file:
-            self.log(f"Loading checkpoint from {checkpoint_file}")
+            print(f"Loading checkpoint from {checkpoint_file}")
             self.model.load_state_dict(torch.load(checkpoint_file, weight_only=False))
         else:
-            self.log(f"No checkpoint found with symbol {symbol} in {root_path}. Starting training from scratch.")
+            print(f"No checkpoint found with symbol {symbol} in {root_path}. Starting training from scratch.")
 
 if __name__ == "__main__":
 
