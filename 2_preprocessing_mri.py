@@ -10,8 +10,8 @@ data_filename = ["t2w.nii.gz",
                  "t1c.nii.gz"]
 seg_filename = "seg.nii.gz"
 
-base_dir = "./data/raw_data/BraTS2023/"
-image_dir = "ASNR-MICCAI-BraTS2023-GLI-Challenge-TrainingData"
+base_dir = "/home/spark17/TeamLimitless/experiments/segmamba/data/raw_data/BraTS2023/"
+image_dir = "ASNR-MICCAI-BraTS2023-SSA-Challenge-TrainingData_V2"
 
 def process_train():
     preprocessor = MultiModalityPreprocessor(base_dir=base_dir, 
@@ -21,8 +21,8 @@ def process_train():
                                    )
 
     out_spacing = [1.0, 1.0, 1.0]
-    output_dir = "./data/fullres/train/"
-    
+    output_dir = "/home/spark17/TeamLimitless/experiments/segmamba/data/fullres/train/"
+        
     preprocessor.run(output_spacing=out_spacing, 
                      output_dir=output_dir, 
                      all_labels=[1, 2, 3],
@@ -42,4 +42,3 @@ if __name__ == "__main__":
 
     plan()
     process_train()
-

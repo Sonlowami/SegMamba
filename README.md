@@ -84,7 +84,7 @@ After pre-processing, the data structure will be in this format:
 
 When the pre-processing process is done, we can train our model.
 
-We mainly use the pre-processde data from last step: **data_dir = "./data/fullres/train"**
+We mainly use the pre-processed data from last step: **data_dir = "./data/fullres/train"**
 
 
 ```bash 

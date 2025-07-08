@@ -10,8 +10,12 @@ from light_training.utils.files_helper import save_new_model_and_delete_last
 from monai.losses.dice import DiceLoss
 set_determinism(123)
 import os
+import sys
+from glob import glob
 
-data_dir = "./data/fullres/train"
+sys.path.insert(0, os.path.abspath('mamba'))
+
+data_dir = "/home/spark17/TeamLimitless/experiments/segmamba/data/fullres/train"
 logdir = f"./logs/segmamba"
 
 model_save_path = os.path.join(logdir, "model")
@@ -28,6 +32,8 @@ roi_size = [128, 128, 128]
 
 def func(m, epochs):
     return np.exp(-10*(1- m / epochs)**2)
+
+        
 
 class BraTSTrainer(Trainer):
     def __init__(self, env_type, max_epochs, batch_size, device="cpu", val_every=1, num_gpus=1, logdir="./logs/", master_ip='localhost', master_port=17750, training_script="train.py"):
@@ -53,6 +59,7 @@ class BraTSTrainer(Trainer):
         
         self.scheduler_type = "poly"
         self.cross = nn.CrossEntropyLoss()
+        self.load_checkpoint_if_exists(root_path=model_save_path, symbol='best')
 
     def training_step(self, batch):
         image, label = self.get_input(batch)
@@ -150,8 +157,20 @@ class BraTSTrainer(Trainer):
             torch.save(self.model.state_dict(), os.path.join(model_save_path, f"tmp_model_ep{self.epoch}_{mean_dice:.4f}.pt"))
 
         print(f"mean_dice is {mean_dice}")
+    
+    def load_checkpoint_if_exists(self, root_path=model_save_path, symbol='best'):
+
+        assert os.path.isdir(root_path), f"Root path {root_path} is not a directory"
+        checkpoint_file = sorted(glob(os.path.join(root_path, f"{symbol}_model_*.pt")))[-1]
+        if checkpoint_file:
+            self.log(f"Loading checkpoint from {checkpoint_file}")
+            self.model.load_state_dict(torch.load(checkpoint_file, weight_only=False))
+        else:
+            self.log(f"No checkpoint found with symbol {symbol} in {root_path}. Starting training from scratch.")
 
 if __name__ == "__main__":
+
+    print(f"Training is initiated with data directory")
 
     trainer = BraTSTrainer(env_type=env,
                             max_epochs=max_epoch,
@@ -162,7 +181,13 @@ if __name__ == "__main__":
                             num_gpus=num_gpus,
                             master_port=17759,
                             training_script=__file__)
+   
+    print(f"Training is initiated with trainer of type {type(trainer)}")
 
     train_ds, val_ds, test_ds = get_train_val_test_loader_from_train(data_dir)
 
+    print(f"Train dataset size: {len(train_ds)}")
+
     trainer.train(train_dataset=train_ds, val_dataset=val_ds)
+
+    print(f"Training completed.")

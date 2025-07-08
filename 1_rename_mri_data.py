@@ -3,7 +3,8 @@
 
 import os 
 
-data_dir = "./data/raw_data/BraTS2023/ASNR-MICCAI-BraTS2023-GLI-Challenge-TrainingData/"
+data_dir = "/home/spark17/TeamLimitless/experiments/segmamba/data/raw_data/BraTS2023/ASNR-MICCAI-BraTS2023-SSA-Challenge-TrainingData_V2"
+
 
 all_cases = os.listdir(data_dir)
 
@@ -22,5 +23,5 @@ for case_name in all_cases:
 
         os.rename(old_path, new_path)
 
-        print(f"{new_path} 命名成功")
+        print(f"{new_path} Naming success")
 
