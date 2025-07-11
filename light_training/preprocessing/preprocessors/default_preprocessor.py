@@ -294,7 +294,7 @@ class DefaultPreprocessor(object):
     def experiment_plan(self, case_name):
 
         data, seg, properties = self.read_data(case_name)
-        print(f"labels is {np.unique(seg)}")
+        #print(f"labels is {np.unique(seg)}")
         spacing = properties["spacing"]
         raw_size = properties["raw_size"]
         intensities_per_channel = properties["intensities_per_channel"]

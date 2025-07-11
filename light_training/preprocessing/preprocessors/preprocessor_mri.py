@@ -70,11 +70,17 @@ class MultiModalityPreprocessor(DefaultPreprocessor):
         ## 一定要是float32！！！！
     
         if self.seg_filename != "":
-            seg = sitk.ReadImage(os.path.join(self.base_dir, self.image_dir, case_name, self.seg_filename))
-            ## 读出来以后一定转float32!!!
-            seg_arr = sitk.GetArrayFromImage(seg).astype(np.float32)
-            seg_arr = seg_arr[None]
-            intensities_per_channel, intensity_statistics_per_channel = self.collect_foreground_intensities(seg_arr, data)
+            try:
+                seg = sitk.ReadImage(os.path.join(self.base_dir, self.image_dir, case_name, self.seg_filename))
+                ## 读出来以后一定转float32!!!
+                seg_arr = sitk.GetArrayFromImage(seg).astype(np.float32)
+                seg_arr = seg_arr[None]
+                intensities_per_channel, intensity_statistics_per_channel = self.collect_foreground_intensities(seg_arr, data)
+            except Exception as e:
+                if 'validation' in self.image_dir.lower():
+                    pass
+                else:
+                    raise RuntimeError(f"Error reading segmentation for case {case_name}: {e}")
 
         else :
             intensities_per_channel = []
