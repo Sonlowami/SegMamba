@@ -12,8 +12,14 @@ seg_filename = "seg.nii.gz"
 
 base_dir = "/home/spark17/TeamLimitless/experiments/segmamba/data/raw_data/BraTS2023/"
 image_dir = "ASNR-MICCAI-BraTS2023-SSA-Challenge-TrainingData_V2"
+val_image_dir = "BraTS2024-SSA-Challenge-ValidationData"
 
-def process_train():
+output_dir = "/home/spark17/TeamLimitless/experiments/segmamba/data/fullres/train/"
+
+def process_train(
+        output_dir=output_dir,
+        image_dir=image_dir
+        ):
     preprocessor = MultiModalityPreprocessor(base_dir=base_dir, 
                                     image_dir=image_dir,
                                     data_filenames=data_filename,
@@ -21,14 +27,13 @@ def process_train():
                                    )
 
     out_spacing = [1.0, 1.0, 1.0]
-    output_dir = "/home/spark17/TeamLimitless/experiments/segmamba/data/fullres/train/"
         
     preprocessor.run(output_spacing=out_spacing, 
                      output_dir=output_dir, 
                      all_labels=[1, 2, 3],
     )
 
-def plan():
+def plan(image_dir=image_dir):
     preprocessor = MultiModalityPreprocessor(base_dir=base_dir, 
                                     image_dir=image_dir,
                                     data_filenames=data_filename,
@@ -40,5 +45,12 @@ def plan():
 
 if __name__ == "__main__":
 
-    plan()
-    process_train()
+    import os
+
+    if os.path.exists(os.path.join(base_dir, image_dir)):
+        plan()
+        process_train()
+    if os.path.exists(os.path.join(base_dir, val_image_dir)):
+        output_dir = "/home/spark17/TeamLimitless/experiments/segmamba/data/fullres/validation/"
+        plan(image_dir=val_image_dir)
+        process_train(image_dir=val_image_dir, output_dir=output_dir)
