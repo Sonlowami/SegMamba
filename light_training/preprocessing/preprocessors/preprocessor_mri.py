@@ -78,7 +78,8 @@ class MultiModalityPreprocessor(DefaultPreprocessor):
                 intensities_per_channel, intensity_statistics_per_channel = self.collect_foreground_intensities(seg_arr, data)
             except Exception as e:
                 if 'validation' in self.image_dir.lower():
-                    pass
+                    intensities_per_channel = []
+                    intensity_statistics_per_channel = []
                 else:
                     raise RuntimeError(f"Error reading segmentation for case {case_name}: {e}")
 
