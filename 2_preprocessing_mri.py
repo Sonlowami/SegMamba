@@ -51,6 +51,6 @@ if __name__ == "__main__":
         plan()
         process_train()
     if os.path.exists(os.path.join(base_dir, val_image_dir)):
-        output_dir = "/home/spark17/TeamLimitless/experiments/segmamba/data/fullres/validation/"
+        val_output_dir = "/home/spark17/TeamLimitless/experiments/segmamba/data/fullres/validation/"
         plan(image_dir=val_image_dir)
-        process_train(image_dir=val_image_dir, output_dir=output_dir)
+        process_train(image_dir=val_image_dir, output_dir=val_output_dir)
