@@ -76,12 +76,9 @@ class MultiModalityPreprocessor(DefaultPreprocessor):
                 seg_arr = sitk.GetArrayFromImage(seg).astype(np.float32)
                 seg_arr = seg_arr[None]
                 intensities_per_channel, intensity_statistics_per_channel = self.collect_foreground_intensities(seg_arr, data)
-            except Exception as e:
-                if 'validation' in self.image_dir.lower():
-                    intensities_per_channel = []
-                    intensity_statistics_per_channel = []
-                else:
-                    raise RuntimeError(f"Error reading segmentation for case {case_name}: {e}")
+            except Exception:
+                intensities_per_channel = []
+                intensity_statistics_per_channel = []
 
         else :
             intensities_per_channel = []
