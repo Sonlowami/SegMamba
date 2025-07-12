@@ -219,6 +219,7 @@ class Trainer:
             self.model.to(self.device)
             self.model.eval()
         val_outputs = []
+        return_list = False
         
         for idx, batch in tqdm(enumerate(val_loader), total=len(val_loader)):
             batch = self.before_data_to_device(batch)
