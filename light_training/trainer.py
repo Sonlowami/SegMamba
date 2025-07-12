@@ -230,8 +230,8 @@ class Trainer:
 
             return_list = False
             val_outputs.append(val_out)
-        if isinstance(val_out, list) or isinstance(val_out, tuple):
-            return_list = True
+            if isinstance(val_out, list) or isinstance(val_out, tuple):
+                return_list = True
 
         val_outputs = torch.tensor(val_outputs)
         if not return_list:
