@@ -50,3 +50,4 @@ if __name__ == "__main__":
         val_output_dir = "/home/spark17/TeamLimitless/experiments/segmamba/data/fullres/validation/"
         plan(image_dir=val_image_dir)
         process_train(image_dir=val_image_dir, output_dir=val_output_dir)
+        
