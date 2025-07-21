@@ -53,8 +53,7 @@ class BraTSTrainer(Trainer):
         self.ce = nn.CrossEntropyLoss() 
         self.mse = nn.MSELoss()
         self.train_process = 18
-        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=1e-2, weight_decay=3e-5,
-                                    momentum=0.99, nesterov=True)
+        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=1e-2, weight_decay=3e-5)
         
         self.scheduler_type = "poly"
         self.cross = nn.CrossEntropyLoss()
