@@ -1,4 +1,5 @@
 import numpy as np
+import argparse
 from light_training.dataloading.dataset import get_kfold_loader
 import torch 
 import torch.nn as nn 
@@ -19,7 +20,6 @@ data_dir = "/home/spark17/TeamLimitless/experiments/segmamba/data/fullres/train"
 logdir = f"./logs/segmamba"
 
 model_save_path = os.path.join(logdir, "model")
-# augmentation = "nomirror"
 augmentation = True
 
 env = "pytorch"
@@ -29,7 +29,7 @@ val_every = 2
 num_gpus = 1
 device = "cuda:0"
 roi_size = [128, 128, 128]
-n_splits = 5  # For 5-fold cross-validation
+n_splits = 5  # 5-fold cross-validation
 
 def func(m, epochs):
     return np.exp(-10*(1- m / epochs)**2)
@@ -168,34 +168,39 @@ class BraTSTrainer(Trainer):
             print(f"No checkpoint found with symbol {symbol} in {root_path}. Starting training from scratch.")
 
 if __name__ == "__main__":
-    print(f"Training is initiated with data directory: {data_dir}")
+    parser = argparse.ArgumentParser(description="Train SegMamba model for a specific fold")
+    parser.add_argument("--fold", type=int, default=0, help=f"Fold number to train (0 to {n_splits-1})")
+    args = parser.parse_args()
 
-    for fold in range(n_splits):
-        print(f"Starting training for fold {fold}")
-        
-        # Create fold-specific model save path
-        fold_model_save_path = os.path.join(model_save_path, f"fold_{fold}")
-        os.makedirs(fold_model_save_path, exist_ok=True)
-        
-        trainer = BraTSTrainer(env_type=env,
-                               max_epochs=max_epoch,
-                               batch_size=batch_size,
-                               device=device,
-                               logdir=logdir,
-                               val_every=val_every,
-                               num_gpus=num_gpus,
-                               master_port=17759 + fold,  # Unique port per fold
-                               training_script=__file__,
-                               fold=fold)
+    fold = args.fold
+    if fold < 0 or fold >= n_splits:
+        raise ValueError(f"Fold number must be between 0 and {n_splits-1}, got {fold}")
+
+    print(f"Training is initiated for fold {fold} with data directory: {data_dir}")
+    
+    # Create fold-specific model save path
+    fold_model_save_path = os.path.join(model_save_path, f"fold_{fold}")
+    os.makedirs(fold_model_save_path, exist_ok=True)
+    
+    trainer = BraTSTrainer(env_type=env,
+                           max_epochs=max_epoch,
+                           batch_size=batch_size,
+                           device=device,
+                           logdir=logdir,
+                           val_every=val_every,
+                           num_gpus=num_gpus,
+                           master_port=17759,  
+                           training_script=__file__,
+                           fold=fold)
    
-        print(f"Fold {fold} - Trainer initialized: {type(trainer)}")
+    print(f"Fold {fold} - Trainer initialized: {type(trainer)}")
 
-        # Use get_kfold_loader instead of get_train_val_test_loader_from_train
-        train_ds, val_ds, test_ds = get_kfold_loader(data_dir, fold=fold)
+    # Use get_kfold_loader for the specified fold
+    train_ds, val_ds, test_ds = get_kfold_loader(data_dir, fold=fold)
 
-        print(f"Fold {fold} - Train dataset size: {len(train_ds)}")
-        print(f"Fold {fold} - Validation dataset size: {len(val_ds)}")
+    print(f"Fold {fold} - Train dataset size: {len(train_ds)}")
+    print(f"Fold {fold} - Validation dataset size: {len(val_ds)}")
 
-        trainer.train(train_dataset=train_ds, val_dataset=val_ds)
+    trainer.train(train_dataset=train_ds, val_dataset=val_ds)
 
-        print(f"Fold {fold} - Training completed.")
+    print(f"Fold {fold} - Training completed.")
